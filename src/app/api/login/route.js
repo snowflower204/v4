@@ -15,13 +15,13 @@ export async function POST(req) {
 
     const { email, password } = body || {};
 
-    // Simple validation (replace Zod)
     if (
       typeof email !== "string" ||
       !email.includes("@") ||
       typeof password !== "string" ||
       password.length < 8
     ) {
+      console.log("Validation Error");
       return new Response(
         JSON.stringify({ message: "Invalid email or password format" }),
         {
@@ -39,6 +39,7 @@ export async function POST(req) {
     await connection.end();
 
     if (rows.length === 0) {
+      console.log("DB Error");
       return new Response(
         JSON.stringify({ message: "Invalid email or password" }),
         {
