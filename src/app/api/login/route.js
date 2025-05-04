@@ -14,10 +14,8 @@ const dbConfig = {
   database: "dbreceipt",
 };
 
-export async function POST(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // Adjust in prod!
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+export async function POST(req) {
+
   try {
     const body = await req.json();
 
@@ -82,7 +80,7 @@ export async function POST(req, res) {
     );
   } catch (error) {
     console.error("Login Error:", error);
-    return new Response(JSON.stringify({ message: "Internal server error" }), {
+    return new Response(JSON.stringify({ message: "Internal server error" + error }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
