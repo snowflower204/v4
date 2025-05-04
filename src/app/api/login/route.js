@@ -1,11 +1,5 @@
 import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
-import { z } from "zod";
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
 
 const dbConfig = {
   host: "localhost",
@@ -15,14 +9,18 @@ const dbConfig = {
 };
 
 export async function POST(req) {
-
   try {
     const body = await req.json();
 
-    // Validate input
-    try {
-      loginSchema.parse(body);
-    } catch (error) {
+    const { email, password } = body || {};
+
+    // Simple validation (replace Zod)
+    if (
+      typeof email !== "string" ||
+      !email.includes("@") ||
+      typeof password !== "string" ||
+      password.length < 8
+    ) {
       return new Response(
         JSON.stringify({ message: "Invalid email or password format" }),
         {
@@ -32,14 +30,11 @@ export async function POST(req) {
       );
     }
 
-    const { email, password } = body;
-
     const connection = await mysql.createConnection(dbConfig);
     const [rows] = await connection.execute(
       "SELECT id, email, password FROM user WHERE email = ?",
       [email]
     );
-
     await connection.end();
 
     if (rows.length === 0) {
@@ -55,7 +50,6 @@ export async function POST(req) {
     const user = rows[0];
 
     const passwordMatch = await bcrypt.compare(password, user.password);
-
     if (!passwordMatch) {
       return new Response(
         JSON.stringify({ message: "Invalid email or password" }),
@@ -66,7 +60,7 @@ export async function POST(req) {
       );
     }
 
-    const { password: hashedPassword, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user;
 
     return new Response(
       JSON.stringify({
@@ -80,9 +74,12 @@ export async function POST(req) {
     );
   } catch (error) {
     console.error("Login Error:", error);
-    return new Response(JSON.stringify({ message: "Internal server error" + error }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ message: "Internal server error: " + error }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 }
