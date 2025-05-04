@@ -1,12 +1,17 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { BrowserMultiFormatReader } from '@zxing/browser';
+import { Scanner } from '@yudiel/react-qr-scanner';
+
 
 interface QRScannerProps {
   onScan: (data: { text: string }) => void;
   onError?: (error: any) => void;
 }
+const App = () => {
+  return <Scanner onScan={(result) => console.log(result)} />;
+};
+
 
 const QRScanner: React.FC<QRScannerProps> = ({ onScan, onError = () => {} }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);

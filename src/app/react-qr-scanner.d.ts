@@ -14,3 +14,5 @@ declare module 'react-qr-scanner' {
     export default QrReader;
   }
   
+
+  
