@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 
 const dbConfig = {
   host: "localhost",
+  port: 3306,
   user: "root",
   password: "123456789",
   database: "dbreceipt",
@@ -32,7 +33,7 @@ export async function POST(req) {
 
     const connection = await mysql.createConnection(dbConfig);
     const [rows] = await connection.execute(
-      "SELECT id, email, password FROM user WHERE email = ?",
+      "SELECT email, password FROM user WHERE email=?",
       [email]
     );
     await connection.end();
